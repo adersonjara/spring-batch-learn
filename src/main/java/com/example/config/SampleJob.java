@@ -1,5 +1,7 @@
 package com.example.config;
 
+import com.example.service.FirstTask;
+import com.example.service.SecondTask;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepContribution;
@@ -20,6 +22,12 @@ public class SampleJob {
 	
 	@Autowired
 	private StepBuilderFactory stepBuilderFactory;
+
+	@Autowired
+	private FirstTask firstTask;
+
+	@Autowired
+	private SecondTask secondTask;
 	
 	@Bean
 	public Job firstJob() {
@@ -31,10 +39,10 @@ public class SampleJob {
 	
 	private Step firstStep() {
 		return stepBuilderFactory.get("First Step")
-		.tasklet(firstTask())
+		.tasklet(firstTask)
 		.build();
 	}
-	
+	/*
 	private Tasklet firstTask() {
 		return new Tasklet() {
 			@Override
@@ -44,13 +52,13 @@ public class SampleJob {
 			}
 		};
 	}
-
+	 */
 	private Step secondStep() {
 		return stepBuilderFactory.get("Second Step")
-				.tasklet(secondTask())
+				.tasklet(secondTask)
 				.build();
 	}
-
+	/*
 	private Tasklet secondTask() {
 		return new Tasklet() {
 			@Override
@@ -60,4 +68,5 @@ public class SampleJob {
 			}
 		};
 	}
+ 	*/
 }
