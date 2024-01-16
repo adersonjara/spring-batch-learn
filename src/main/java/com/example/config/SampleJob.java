@@ -1,5 +1,6 @@
 package com.example.config;
 
+import com.example.listener.FirstJobListener;
 import com.example.service.FirstTask;
 import com.example.service.SecondTask;
 import org.springframework.batch.core.Job;
@@ -7,6 +8,7 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
@@ -28,12 +30,17 @@ public class SampleJob {
 
 	@Autowired
 	private SecondTask secondTask;
+
+	@Autowired
+	private FirstJobListener firstJobListener;
 	
 	@Bean
 	public Job firstJob() {
 		return jobBuilderFactory.get("First Job")
+		.incrementer(new RunIdIncrementer())
 		.start(firstStep())
 		.next(secondStep())
+		.listener(firstJobListener)
 		.build();
 	}
 	
