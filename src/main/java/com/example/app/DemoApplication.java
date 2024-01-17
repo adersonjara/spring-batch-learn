@@ -7,7 +7,8 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @EnableBatchProcessing
-@ComponentScan({"com.example.config", "com.example.service","com.example.listener"})
+@ComponentScan({"com.example.config", "com.example.service","com.example.listener",
+				"com.example.reader","com.example.processor","com.example.writer"})
 public class DemoApplication {
 
 	public static void main(String[] args) {

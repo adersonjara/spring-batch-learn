@@ -11,6 +11,7 @@ public class FirstTask implements Tasklet {
     @Override
     public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
         System.out.println("This is first tasklet step ---------------");
+        System.out.println("SEC = " + chunkContext.getStepContext().getStepExecutionContext());
         return RepeatStatus.FINISHED;
     }
 }

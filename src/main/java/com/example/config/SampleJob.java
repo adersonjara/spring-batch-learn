@@ -1,8 +1,12 @@
 package com.example.config;
 
 import com.example.listener.FirstJobListener;
+import com.example.listener.FirstStepListener;
+import com.example.processor.FirstItemProcessor;
+import com.example.reader.FirstItemReader;
 import com.example.service.FirstTask;
 import com.example.service.SecondTask;
+import com.example.writer.FirstItemWriter;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.StepContribution;
@@ -33,8 +37,20 @@ public class SampleJob {
 
 	@Autowired
 	private FirstJobListener firstJobListener;
+
+	@Autowired
+	private FirstStepListener firstStepListener;
+
+	@Autowired
+	private FirstItemReader firstItemReader;
+
+	@Autowired
+	private FirstItemProcessor firstItemProcessor;
+
+	@Autowired
+	private FirstItemWriter firstItemWriter;
 	
-	@Bean
+	//@Bean
 	public Job firstJob() {
 		return jobBuilderFactory.get("First Job")
 		.incrementer(new RunIdIncrementer())
@@ -47,6 +63,7 @@ public class SampleJob {
 	private Step firstStep() {
 		return stepBuilderFactory.get("First Step")
 		.tasklet(firstTask)
+		.listener(firstStepListener)
 		.build();
 	}
 	/*
@@ -76,4 +93,21 @@ public class SampleJob {
 		};
 	}
  	*/
+
+	@Bean
+	public Job secondJob(){
+		return jobBuilderFactory.get("Second Job")
+				.incrementer(new RunIdIncrementer())
+				.start(firstChunkStep())
+				.build();
+	}
+
+	private Step firstChunkStep() {
+		return stepBuilderFactory.get("first Chunk Step")
+				.<Integer,Long>chunk(3)
+				.reader(firstItemReader)
+				.processor(firstItemProcessor)
+				.writer(firstItemWriter)
+				.build();
+	}
 }
