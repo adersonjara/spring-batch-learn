@@ -129,9 +129,11 @@ public class SampleJob {
 
 		flatFileItemReader.setLineMapper(new DefaultLineMapper<StudentCsv>(){
 			{
-				setLineTokenizer(new DelimitedLineTokenizer(){
+				setLineTokenizer(new DelimitedLineTokenizer("|"){
 					{
 						setNames("ID","First Name","Last Name","Email");
+						// otra forma de definir el delimitador es esta
+						// setDelimiter("|");
 					}
 				});
 
