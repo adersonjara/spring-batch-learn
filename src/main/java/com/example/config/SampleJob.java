@@ -130,7 +130,7 @@ public class SampleJob {
 
 		flatFileItemReader.setResource(fileSystemResource);
 
-		flatFileItemReader.setLineMapper(new DefaultLineMapper<StudentCsv>(){
+		/*flatFileItemReader.setLineMapper(new DefaultLineMapper<StudentCsv>(){
 			{
 				setLineTokenizer(new DelimitedLineTokenizer("|"){
 					{
@@ -146,7 +146,23 @@ public class SampleJob {
 					}
 				});
 			}
-		});
+		});*/
+
+		DefaultLineMapper<StudentCsv> defaultLineMapper =
+				new DefaultLineMapper<StudentCsv>();
+
+		DelimitedLineTokenizer delimitedLineTokenizer = new DelimitedLineTokenizer();
+		delimitedLineTokenizer.setNames("ID","First Name","Last Name","Email");
+
+		defaultLineMapper.setLineTokenizer(delimitedLineTokenizer);
+
+		BeanWrapperFieldSetMapper<StudentCsv> fieldSetMapper =
+				new BeanWrapperFieldSetMapper<StudentCsv>();
+		fieldSetMapper.setTargetType(StudentCsv.class);
+
+		defaultLineMapper.setFieldSetMapper(fieldSetMapper);
+
+		flatFileItemReader.setLineMapper(defaultLineMapper);
 
 		flatFileItemReader.setLinesToSkip(1);
 
