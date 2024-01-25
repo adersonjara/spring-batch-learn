@@ -3,6 +3,7 @@ package com.example.config;
 import com.example.listener.FirstJobListener;
 import com.example.listener.FirstStepListener;
 import com.example.model.StudentCsv;
+import com.example.model.StudentJdbc;
 import com.example.model.StudentJson;
 import com.example.model.StudentXml;
 import com.example.processor.FirstItemProcessor;
@@ -19,6 +20,7 @@ import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
+import org.springframework.batch.item.database.JdbcCursorItemReader;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
@@ -32,8 +34,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.FileSystemResource;
+import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
+import javax.sql.DataSource;
 import java.io.File;
 
 @Configuration
@@ -65,6 +69,9 @@ public class SampleJob {
 
 	@Autowired
 	private FirstItemWriter firstItemWriter;
+
+	@Autowired
+	private DataSource dataSource;
 	
 	@Bean
 	public Job firstJob() {
@@ -120,10 +127,11 @@ public class SampleJob {
 
 	private Step firstChunkStep() {
 		return stepBuilderFactory.get("first Chunk Step")
-				.<StudentXml,StudentXml>chunk(3)
+				.<StudentJdbc,StudentJdbc>chunk(3)
 				//.reader(flatFileItemReader(null))
 				//.reader(jsonItemReader(null))
-				.reader(studentXmlStaxEventItemReader(null))
+				//.reader(studentXmlStaxEventItemReader(null))
+				.reader(jdbcJdbcCursorItemReader())
 				//.processor(firstItemProcessor)
 				.writer(firstItemWriter)
 				.build();
@@ -211,5 +219,25 @@ public class SampleJob {
 		});
 
 		return staxEventItemReader;
+	}
+
+	public JdbcCursorItemReader<StudentJdbc> jdbcJdbcCursorItemReader(){
+		JdbcCursorItemReader<StudentJdbc> jdbcJdbcCursorItemReader =
+				new JdbcCursorItemReader<StudentJdbc>();
+
+		jdbcJdbcCursorItemReader.setDataSource(dataSource);
+		jdbcJdbcCursorItemReader.setSql(
+				"SELECT id, first_name as firstName,last_name as lastName," +
+						"email from student"
+		);
+
+		jdbcJdbcCursorItemReader.setRowMapper(new BeanPropertyRowMapper<StudentJdbc>(){
+			{
+				setMappedClass(StudentJdbc.class);
+			}
+		});
+
+		return jdbcJdbcCursorItemReader;
+
 	}
 }
