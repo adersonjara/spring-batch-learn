@@ -1,5 +1,9 @@
 package com.example.model;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+
+@XmlRootElement(name = "student")
 public class StudentJdbc {
     private Long id;
     private String firstName;
@@ -14,6 +18,7 @@ public class StudentJdbc {
         this.id = id;
     }
 
+    @XmlElement(name = "first_name")
     public String getFirstName() {
         return firstName;
     }
