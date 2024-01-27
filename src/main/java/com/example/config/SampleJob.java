@@ -7,7 +7,6 @@ import com.example.processor.FirstItemProcessor;
 import com.example.reader.FirstItemReader;
 import com.example.service.FirstTask;
 import com.example.service.SecondTask;
-import com.example.service.StudentService;
 import com.example.writer.FirstItemWriter;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -20,9 +19,14 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.adapter.ItemReaderAdapter;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
+import org.springframework.batch.item.file.FlatFileFooterCallback;
+import org.springframework.batch.item.file.FlatFileHeaderCallback;
 import org.springframework.batch.item.file.FlatFileItemReader;
+import org.springframework.batch.item.file.FlatFileItemWriter;
 import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.batch.item.file.mapping.DefaultLineMapper;
+import org.springframework.batch.item.file.transform.BeanWrapperFieldExtractor;
+import org.springframework.batch.item.file.transform.DelimitedLineAggregator;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.item.json.JacksonJsonObjectReader;
 import org.springframework.batch.item.json.JsonItemReader;
@@ -41,6 +45,9 @@ import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
 import javax.sql.DataSource;
 import java.io.File;
+import java.io.IOException;
+import java.io.Writer;
+import java.util.Date;
 
 @Configuration
 public class SampleJob {
@@ -71,9 +78,9 @@ public class SampleJob {
 
 	@Autowired
 	private FirstItemWriter firstItemWriter;
-
+	/*
 	@Autowired
-	private StudentService studentService;
+	private StudentService studentService;*/
 
 	@Bean
 	@Primary
@@ -142,14 +149,15 @@ public class SampleJob {
 
 	private Step firstChunkStep() {
 		return stepBuilderFactory.get("first Chunk Step")
-				.<StudentResponse,StudentResponse>chunk(3)
+				.<StudentJdbc,StudentJdbc>chunk(3)
 				//.reader(flatFileItemReader(null))
 				//.reader(jsonItemReader(null))
 				//.reader(studentXmlStaxEventItemReader(null))
-				//.reader(jdbcJdbcCursorItemReader())
-				.reader(itemReaderAdapter())
+				.reader(jdbcJdbcCursorItemReader())
+				//.reader(itemReaderAdapter())
 				//.processor(firstItemProcessor)
-				.writer(firstItemWriter)
+				//.writer(firstItemWriter)
+				.writer(flatFileItemWriter(null))
 				.build();
 	}
 
@@ -257,6 +265,7 @@ public class SampleJob {
 
 	}
 
+	/*
 	public ItemReaderAdapter<StudentResponse> itemReaderAdapter(){
 		ItemReaderAdapter<StudentResponse> itemReaderAdapter =
 				new ItemReaderAdapter<StudentResponse>();
@@ -266,5 +275,43 @@ public class SampleJob {
 		itemReaderAdapter.setArguments(new Object[]{1L, "Test"});
 
 		return itemReaderAdapter;
+	}
+	 */
+
+	@StepScope
+	@Bean
+	public FlatFileItemWriter<StudentJdbc> flatFileItemWriter(
+			@Value("#{jobParameters['outputFile']}") FileSystemResource fileSystemResource
+	){
+		FlatFileItemWriter<StudentJdbc> flatFileItemWriter =
+				new FlatFileItemWriter<StudentJdbc>();
+
+		flatFileItemWriter.setResource(fileSystemResource);
+
+		flatFileItemWriter.setHeaderCallback(new FlatFileHeaderCallback() {
+			@Override
+			public void writeHeader(Writer writer) throws IOException {
+				writer.write("Id,First Name,Last Name,Email");
+			}
+		});
+
+		flatFileItemWriter.setLineAggregator(new DelimitedLineAggregator<StudentJdbc>(){
+			{
+				setFieldExtractor(new BeanWrapperFieldExtractor<StudentJdbc>(){
+					{
+						setNames(new String[]{"id","firstName","lastName","email"});
+					}
+				});
+			}
+		});
+
+		flatFileItemWriter.setFooterCallback(new FlatFileFooterCallback() {
+			@Override
+			public void writeFooter(Writer writer) throws IOException {
+				writer.write("Created @ "+new Date());
+			}
+		});
+
+		return flatFileItemWriter;
 	}
 }
