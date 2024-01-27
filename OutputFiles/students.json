@@ -1,12 +1,12 @@
 [
- {"id":1,"firstName":"Jhonn","lastName":"Smith","email":"jhonn@gmail.com"},
- {"id":2,"firstName":"Alice","lastName":"Johnson","email":"alice@gmail.com"},
- {"id":3,"firstName":"Bob","lastName":"Williams","email":"bob@gmail.com"},
- {"id":4,"firstName":"Emma","lastName":"Jones","email":"emma@gmail.com"},
- {"id":5,"firstName":"Michael","lastName":"Davis","email":"michael@gmail.com"},
- {"id":6,"firstName":"Olivia","lastName":"Miller","email":"olivia@gmail.com"},
- {"id":7,"firstName":"James","lastName":"Brown","email":"james@gmail.com"},
- {"id":8,"firstName":"Sophia","lastName":"Wilson","email":"sophia@gmail.com"},
- {"id":9,"firstName":"Daniel","lastName":"Taylor","email":"daniel@gmail.com"},
- {"id":10,"firstName":"Ava","lastName":"Moore","email":"avauniversity@gmail.com"}
+ {"id":1,"lastName":"Smith","email":"jhonn@gmail.com","first_name":"Jhonn"},
+ {"id":2,"lastName":"Johnson","email":"alice@gmail.com","first_name":"Alice"},
+ {"id":3,"lastName":"Williams","email":"bob@gmail.com","first_name":"Bob"},
+ {"id":4,"lastName":"Jones","email":"emma@gmail.com","first_name":"Emma"},
+ {"id":5,"lastName":"Davis","email":"michael@gmail.com","first_name":"Michael"},
+ {"id":6,"lastName":"Miller","email":"olivia@gmail.com","first_name":"Olivia"},
+ {"id":7,"lastName":"Brown","email":"james@gmail.com","first_name":"James"},
+ {"id":8,"lastName":"Wilson","email":"sophia@gmail.com","first_name":"Sophia"},
+ {"id":9,"lastName":"Taylor","email":"daniel@gmail.com","first_name":"Daniel"},
+ {"id":10,"lastName":"Moore","email":"avauniversity@gmail.com","first_name":"Ava"}
 ]
