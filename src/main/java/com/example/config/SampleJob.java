@@ -7,6 +7,7 @@ import com.example.processor.FirstItemProcessor;
 import com.example.reader.FirstItemReader;
 import com.example.service.FirstTask;
 import com.example.service.SecondTask;
+import com.example.service.StudentService;
 import com.example.writer.FirstItemWriter;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -18,6 +19,7 @@ import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.adapter.ItemReaderAdapter;
+import org.springframework.batch.item.adapter.ItemWriterAdapter;
 import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
 import org.springframework.batch.item.database.ItemPreparedStatementSetter;
 import org.springframework.batch.item.database.JdbcBatchItemWriter;
@@ -86,9 +88,9 @@ public class SampleJob {
 
 	@Autowired
 	private FirstItemWriter firstItemWriter;
-	/*
+
 	@Autowired
-	private StudentService studentService;*/
+	private StudentService studentService;
 
 	@Bean
 	@Primary
@@ -168,8 +170,9 @@ public class SampleJob {
 				//.writer(flatFileItemWriter(null))
 				//.writer(jsonFileItemWriter(null))
 				//.writer(staxEventItemReader(null))
-				//.writer(jdbcJdbcBatchItemWriter())
-				.writer(jdbcJdbcBatchItemWriter1())
+				//.writer(jdbcBatchItemWriter())
+				//.writer(jdbcBatchItemWriter1())
+				.writer(itemWriterAdapter())
 				.build();
 	}
 
@@ -375,17 +378,17 @@ public class SampleJob {
 	}
 
 	@Bean
-	public JdbcBatchItemWriter<StudentCsv> jdbcJdbcBatchItemWriter1(){
-		JdbcBatchItemWriter<StudentCsv> jdbcJdbcBatchItemWriter =
+	public JdbcBatchItemWriter<StudentCsv> jdbcBatchItemWriter1(){
+		JdbcBatchItemWriter<StudentCsv> jdbcBatchItemWriter =
 				new JdbcBatchItemWriter<StudentCsv>();
 
-		jdbcJdbcBatchItemWriter.setDataSource(universityDataSource());
-		jdbcJdbcBatchItemWriter.setSql(
+		jdbcBatchItemWriter.setDataSource(universityDataSource());
+		jdbcBatchItemWriter.setSql(
 				"insert into student(id,first_name,last_name,email) " +
 						"values(?,?,?,?)"
 		);
 
-		jdbcJdbcBatchItemWriter.setItemPreparedStatementSetter(
+		jdbcBatchItemWriter.setItemPreparedStatementSetter(
 				new ItemPreparedStatementSetter<StudentCsv>() {
 					@Override
 					public void setValues(StudentCsv item, PreparedStatement ps) throws SQLException {
@@ -397,6 +400,16 @@ public class SampleJob {
 				}
 		);
 
-		return jdbcJdbcBatchItemWriter;
+		return jdbcBatchItemWriter;
+	}
+
+	public ItemWriterAdapter<StudentCsv> itemWriterAdapter(){
+		ItemWriterAdapter<StudentCsv> itemWriterAdapter =
+				new ItemWriterAdapter<StudentCsv>();
+
+		itemWriterAdapter.setTargetObject(studentService);
+		itemWriterAdapter.setTargetMethod("restCallToCreateStudent");
+
+		return itemWriterAdapter;
 	}
 }

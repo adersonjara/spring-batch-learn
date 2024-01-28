@@ -1,6 +1,6 @@
-/*
 package com.example.service;
 
+import com.example.model.StudentCsv;
 import com.example.model.StudentResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -38,5 +38,11 @@ public class StudentService {
         return null;
     }
 
+    public StudentResponse restCallToCreateStudent(StudentCsv studentCsv){
+        RestTemplate restTemplate = new RestTemplate();
+        return restTemplate.postForObject("http://localhost:8081/api/v1/createStudent",
+                studentCsv,
+                StudentResponse.class);
+    }
+
 }
-*/
