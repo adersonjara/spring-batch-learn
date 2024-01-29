@@ -17,6 +17,7 @@ import org.springframework.batch.core.configuration.annotation.StepBuilderFactor
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.core.scope.context.ChunkContext;
+import org.springframework.batch.core.step.skip.AlwaysSkipItemSkipPolicy;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.adapter.ItemReaderAdapter;
 import org.springframework.batch.item.adapter.ItemWriterAdapter;
@@ -159,20 +160,13 @@ public class SampleJob {
 
 	private Step firstChunkStep() {
 		return stepBuilderFactory.get("first Chunk Step")
-				.<StudentCsv,StudentCsv>chunk(3)
+				.<StudentCsv,StudentJson>chunk(3)
 				.reader(flatFileItemReader(null))
-				//.reader(jsonItemReader(null))
-				//.reader(studentXmlStaxEventItemReader(null))
-				//.reader(jdbcJdbcCursorItemReader())
-				//.reader(itemReaderAdapter())
-				//.processor(firstItemProcessor)
-				//.writer(firstItemWriter)
-				//.writer(flatFileItemWriter(null))
-				//.writer(jsonFileItemWriter(null))
-				//.writer(staxEventItemReader(null))
-				//.writer(jdbcBatchItemWriter())
-				//.writer(jdbcBatchItemWriter1())
-				.writer(itemWriterAdapter())
+				.writer(jsonFileItemWriter(null))
+				.faultTolerant()
+				.skip(Throwable.class) //Throwable.class captura todas las excepciones , FlatFileParseException.class una especifica
+				//.skipLimit(Integer.MAX_VALUE) // Opción 1 , para detectar registros faliidos y saltarlos
+				.skipPolicy(new AlwaysSkipItemSkipPolicy()) // Opción 2 , para detectar registros faliidos y saltarlos
 				.build();
 	}
 
