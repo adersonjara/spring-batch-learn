@@ -12,7 +12,7 @@ public class FirstItemProcessor implements ItemProcessor<StudentCsv, StudentJson
     public StudentJson process(StudentCsv item) throws Exception {
         System.out.println("Inside Item Processor --");
 
-        if (item.getId() == 5){
+        if (item.getId() == 6){
             System.out.println("error");
             throw new NullPointerException();
         }
