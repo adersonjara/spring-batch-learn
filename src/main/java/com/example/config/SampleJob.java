@@ -2,6 +2,7 @@ package com.example.config;
 
 import com.example.listener.FirstJobListener;
 import com.example.listener.FirstStepListener;
+import com.example.listener.SkipListener;
 import com.example.model.*;
 import com.example.processor.FirstItemProcessor;
 import com.example.reader.FirstItemReader;
@@ -93,6 +94,9 @@ public class SampleJob {
 	@Autowired
 	private StudentService studentService;
 
+	@Autowired
+	private SkipListener skipListener;
+
 	@Bean
 	@Primary
 	@ConfigurationProperties(prefix = "spring.datasource")
@@ -159,7 +163,7 @@ public class SampleJob {
 	}
 
 	private Step firstChunkStep() {
-		return stepBuilderFactory.get("first Chunk Step")
+		return stepBuilderFactory.get("First Chunk Step")
 				.<StudentCsv,StudentJson>chunk(3)
 				.reader(flatFileItemReader(null))
 				.writer(jsonFileItemWriter(null))
@@ -167,6 +171,7 @@ public class SampleJob {
 				.skip(Throwable.class) //Throwable.class captura todas las excepciones , FlatFileParseException.class una especifica
 				//.skipLimit(Integer.MAX_VALUE) // Opción 1 , para detectar registros faliidos y saltarlos
 				.skipPolicy(new AlwaysSkipItemSkipPolicy()) // Opción 2 , para detectar registros faliidos y saltarlos
+				.listener(skipListener)
 				.build();
 	}
 
