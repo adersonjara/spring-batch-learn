@@ -60,6 +60,7 @@ import java.io.Writer;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.Date;
+import java.util.List;
 
 @Configuration
 public class SampleJob {
@@ -166,6 +167,7 @@ public class SampleJob {
 		return stepBuilderFactory.get("First Chunk Step")
 				.<StudentCsv,StudentJson>chunk(3)
 				.reader(flatFileItemReader(null))
+				.processor(firstItemProcessor)
 				.writer(jsonFileItemWriter(null))
 				.faultTolerant()
 				.skip(Throwable.class) //Throwable.class captura todas las excepciones , FlatFileParseException.class una especifica
@@ -335,7 +337,18 @@ public class SampleJob {
 			@Value("#{jobParameters['outputFile']}") FileSystemResource fileSystemResource
 	){
 		JsonFileItemWriter<StudentJson> jsonFileItemWriter =
-				new JsonFileItemWriter<>(fileSystemResource,new JacksonJsonObjectMarshaller<StudentJson>());
+				new JsonFileItemWriter<StudentJson>(fileSystemResource,
+						new JacksonJsonObjectMarshaller<StudentJson>()){
+					@Override
+					public String doWrite(List<? extends StudentJson> items){
+						items.stream().forEach(item -> {
+							if(item.getId() == 3){
+								throw new NullPointerException();
+							}
+						});
+						return super.doWrite(items);
+					}
+				};
 		return jsonFileItemWriter;
 	}
 

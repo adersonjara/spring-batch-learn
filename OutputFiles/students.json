@@ -1,10 +1,8 @@
 [
- {"id":1,"firstName":"Jhon","lastName":"Smith","email":"jhon@gmail.com"},
- {"id":3,"firstName":"Pedro","lastName":"Smith","email":"pedro@gmail.com"},
- {"id":4,"firstName":"Emily","lastName":"Johnson","email":"emily@gmail.com"},
- {"id":5,"firstName":"Michael","lastName":"Anderson","email":"michael@gmail.com"},
- {"id":7,"firstName":"Christopher","lastName":"Brown","email":"chris@gmail.com"},
- {"id":8,"firstName":"Amanda","lastName":"Jones","email":"amanda@gmail.com"},
- {"id":9,"firstName":"David","lastName":"Martinez","email":"david@gmail.com"},
- {"id":10,"firstName":"Emma","lastName":"Davis","email":"emma@gmail.com"}
+ {"id":1,"lastName":"Smith","email":"jhon@gmail.com","first_name":"Jhon"},
+ {"id":4,"lastName":"Johnson","email":"emily@gmail.com","first_name":"Emily"},
+ {"id":7,"lastName":"Brown","email":"chris@gmail.com","first_name":"Christopher"},
+ {"id":8,"lastName":"Jones","email":"amanda@gmail.com","first_name":"Amanda"},
+ {"id":9,"lastName":"Martinez","email":"david@gmail.com","first_name":"David"},
+ {"id":10,"lastName":"Davis","email":"emma@gmail.com","first_name":"Emma"}
 ]
