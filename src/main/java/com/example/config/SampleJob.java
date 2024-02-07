@@ -5,6 +5,7 @@ import com.example.listener.FirstStepListener;
 import com.example.listener.SkipListener;
 import com.example.listener.SkipListenerImpl;
 import com.example.model.*;
+import com.example.postgresql.entity.Student;
 import com.example.processor.FirstItemProcessor;
 import com.example.reader.FirstItemReader;
 import com.example.service.FirstTask;
@@ -23,10 +24,7 @@ import org.springframework.batch.core.step.skip.AlwaysSkipItemSkipPolicy;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.item.adapter.ItemReaderAdapter;
 import org.springframework.batch.item.adapter.ItemWriterAdapter;
-import org.springframework.batch.item.database.BeanPropertyItemSqlParameterSourceProvider;
-import org.springframework.batch.item.database.ItemPreparedStatementSetter;
-import org.springframework.batch.item.database.JdbcBatchItemWriter;
-import org.springframework.batch.item.database.JdbcCursorItemReader;
+import org.springframework.batch.item.database.*;
 import org.springframework.batch.item.file.FlatFileFooterCallback;
 import org.springframework.batch.item.file.FlatFileHeaderCallback;
 import org.springframework.batch.item.file.FlatFileItemReader;
@@ -433,6 +431,7 @@ public class SampleJob {
 		return jdbcBatchItemWriter;
 	}
 
+	/*
 	public ItemWriterAdapter<StudentCsv> itemWriterAdapter(){
 		ItemWriterAdapter<StudentCsv> itemWriterAdapter =
 				new ItemWriterAdapter<StudentCsv>();
@@ -441,5 +440,26 @@ public class SampleJob {
 		itemWriterAdapter.setTargetMethod("restCallToCreateStudent");
 
 		return itemWriterAdapter;
+	}
+
+	 */
+
+	public JpaCursorItemReader<Student> jpaCursorItemReader(){
+		JpaCursorItemReader<Student> jpaCursorItemReader =
+				new JpaCursorItemReader<Student>();
+
+		jpaCursorItemReader.setEntityManagerFactory(postgresqlEntityManagerFactory);
+		jpaCursorItemReader.setQueryString("From Student");
+
+		return jpaCursorItemReader;
+	}
+
+	public JpaItemWriter<com.example.mysql.entity.Student> jpaItemWriter(){
+		JpaItemWriter<com.example.mysql.entity.Student> jpaItemWriter =
+				new JpaItemWriter<com.example.mysql.entity.Student>();
+
+		jpaItemWriter.setEntityManagerFactory(mysqlEntityManagerFactory);
+
+		return jpaItemWriter;
 	}
 }
