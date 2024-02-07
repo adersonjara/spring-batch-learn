@@ -1,11 +1,15 @@
 package com.example.config;
 
+import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
+import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
+import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 
+import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 
 @Configuration
@@ -28,6 +32,34 @@ public class DatabaseConfig {
     @ConfigurationProperties(prefix = "spring.postgresdatasource")
     public DataSource postgresdatasource(){
         return DataSourceBuilder.create().build();
+    }
+
+    @Bean
+    public EntityManagerFactory postgresqlEntityManagerFactory(){
+        LocalContainerEntityManagerFactoryBean lem =
+                new LocalContainerEntityManagerFactoryBean();
+
+        lem.setDataSource(postgresdatasource());
+        lem.setPackagesToScan("com.example.postgresql.entity");
+        lem.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
+        lem.setPersistenceProviderClass(HibernatePersistenceProvider.class);
+        lem.afterPropertiesSet();
+
+        return lem.getObject();
+    }
+
+    @Bean
+    public EntityManagerFactory mysqlEntityManagerFactory(){
+        LocalContainerEntityManagerFactoryBean lem =
+                new LocalContainerEntityManagerFactoryBean();
+
+        lem.setDataSource(universitydatasource());
+        lem.setPackagesToScan("com.example.mysql.entity");
+        lem.setJpaVendorAdapter(new HibernateJpaVendorAdapter());
+        lem.setPersistenceProviderClass(HibernatePersistenceProvider.class);
+        lem.afterPropertiesSet();
+
+        return lem.getObject();
     }
 
 }

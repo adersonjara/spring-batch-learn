@@ -55,6 +55,7 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
+import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
@@ -114,6 +115,14 @@ public class SampleJob {
 	@Autowired
 	@Qualifier("postgresdatasource")
 	private DataSource postgresdatasource;
+
+	@Autowired
+	@Qualifier("postgresqlEntityManagerFactory")
+	private EntityManagerFactory postgresqlEntityManagerFactory;
+
+	@Autowired
+	@Qualifier("mysqlEntityManagerFactory")
+	private EntityManagerFactory mysqlEntityManagerFactory;
 	
 	@Bean
 	public Job firstJob() {
