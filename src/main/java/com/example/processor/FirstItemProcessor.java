@@ -3,24 +3,28 @@ package com.example.processor;
 import com.example.model.StudentCsv;
 import com.example.model.StudentJdbc;
 import com.example.model.StudentJson;
+import com.example.postgresql.entity.Student;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.stereotype.Component;
 
 @Component
-public class FirstItemProcessor implements ItemProcessor<StudentCsv, StudentJson> {
+public class FirstItemProcessor implements ItemProcessor<Student, com.example.mysql.entity.Student> {
     @Override
-    public StudentJson process(StudentCsv item) throws Exception {
+    public com.example.mysql.entity.Student process(Student item) throws Exception {
 
+        System.out.println(" * "+item.toString());
 
-        if (item.getId() == 6){
-            System.out.println("Inside Item Processor --");
-            throw new NullPointerException();
-        }
-        StudentJson studentJson = new StudentJson();
-        studentJson.setId(item.getId());
-        studentJson.setFirstName(item.getFirstName());
-        studentJson.setLastName(item.getLastName());
-        studentJson.setEmail(item.getEmail());
-        return studentJson;
+        com.example.mysql.entity.Student student =
+                new com.example.mysql.entity.Student();
+
+        student.setId(item.getId());
+        student.setFirstName(item.getFirstName());
+        student.setLastName(item.getLastName());
+        student.setEmail(item.getEmail());
+        student.setDeptId(item.getDeptId());
+        student.setIsActive(item.getIsActive() != null ?
+                Boolean.valueOf(item.getIsActive()) : false);
+
+        return student;
     }
 }

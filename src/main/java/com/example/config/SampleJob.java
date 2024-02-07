@@ -176,10 +176,10 @@ public class SampleJob {
 
 	private Step firstChunkStep() {
 		return stepBuilderFactory.get("First Chunk Step")
-				.<StudentCsv,StudentJson>chunk(3)
-				.reader(flatFileItemReader(null))
+				.<Student, com.example.mysql.entity.Student>chunk(3)
+				.reader(jpaCursorItemReader())
 				.processor(firstItemProcessor)
-				.writer(jsonFileItemWriter(null))
+				.writer(jpaItemWriter())
 				.faultTolerant()
 				.skip(Throwable.class) //Throwable.class captura todas las excepciones , FlatFileParseException.class una especifica
 				//.skipLimit(Integer.MAX_VALUE) // Opción 1 , para detectar registros faliidos y saltarlos
