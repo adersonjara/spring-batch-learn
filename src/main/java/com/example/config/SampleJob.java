@@ -44,6 +44,7 @@ import org.springframework.batch.item.xml.StaxEventItemReader;
 import org.springframework.batch.item.xml.StaxEventItemWriter;
 import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
@@ -102,18 +103,13 @@ public class SampleJob {
 	@Autowired
 	private SkipListenerImpl skipListenerImpl;
 
-	@Bean
-	@Primary
-	@ConfigurationProperties(prefix = "spring.datasource")
-	public DataSource dataSource(){
-		return DataSourceBuilder.create().build();
-	}
+	@Autowired
+	@Qualifier("datasource")
+	private DataSource dataSource;
 
-	@Bean
-	@ConfigurationProperties(prefix = "spring.universitydatasource")
-	public DataSource universityDataSource(){
-		return DataSourceBuilder.create().build();
-	}
+	@Autowired
+	@Qualifier("universitydatasource")
+	private DataSource universityDataSource;
 	
 	@Bean
 	public Job firstJob() {
@@ -176,7 +172,10 @@ public class SampleJob {
 				.faultTolerant()
 				.skip(Throwable.class) //Throwable.class captura todas las excepciones , FlatFileParseException.class una especifica
 				//.skipLimit(Integer.MAX_VALUE) // Opción 1 , para detectar registros faliidos y saltarlos
-				.skipPolicy(new AlwaysSkipItemSkipPolicy()) // Opción 2 , para detectar registros faliidos y saltarlos
+				.skipLimit(100)
+				//.skipPolicy(new AlwaysSkipItemSkipPolicy()) // Opción 2 , para detectar registros faliidos y saltarlos
+				.retryLimit(3)
+				.retry(Throwable.class)
 				//.listener(skipListener)
 				.listener(skipListenerImpl)
 				.build();
@@ -270,7 +269,7 @@ public class SampleJob {
 		JdbcCursorItemReader<StudentJdbc> jdbcJdbcCursorItemReader =
 				new JdbcCursorItemReader<StudentJdbc>();
 
-		jdbcJdbcCursorItemReader.setDataSource(universityDataSource());
+		jdbcJdbcCursorItemReader.setDataSource(universityDataSource);
 		jdbcJdbcCursorItemReader.setSql(
 				"SELECT id, first_name as firstName,last_name as lastName," +
 						"email from student"
@@ -348,6 +347,7 @@ public class SampleJob {
 					public String doWrite(List<? extends StudentJson> items){
 						items.stream().forEach(item -> {
 							if(item.getId() == 3){
+								System.out.println("Inside jsonFileItemWriter");
 								throw new NullPointerException();
 							}
 						});
@@ -382,7 +382,7 @@ public class SampleJob {
 		JdbcBatchItemWriter<StudentCsv> jdbcJdbcBatchItemWriter =
 				new JdbcBatchItemWriter<StudentCsv>();
 
-		jdbcJdbcBatchItemWriter.setDataSource(universityDataSource());
+		jdbcJdbcBatchItemWriter.setDataSource(universityDataSource);
 		jdbcJdbcBatchItemWriter.setSql(
 				"insert into student(id,first_name,last_name,email) " +
 						"values(:id,:firstName,:lastName,:email)"
@@ -399,7 +399,7 @@ public class SampleJob {
 		JdbcBatchItemWriter<StudentCsv> jdbcBatchItemWriter =
 				new JdbcBatchItemWriter<StudentCsv>();
 
-		jdbcBatchItemWriter.setDataSource(universityDataSource());
+		jdbcBatchItemWriter.setDataSource(universityDataSource);
 		jdbcBatchItemWriter.setSql(
 				"insert into student(id,first_name,last_name,email) " +
 						"values(?,?,?,?)"
