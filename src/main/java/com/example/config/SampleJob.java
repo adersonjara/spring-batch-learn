@@ -51,6 +51,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.jdbc.core.BeanPropertyRowMapper;
+import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.oxm.jaxb.Jaxb2Marshaller;
 
 import javax.persistence.EntityManagerFactory;
@@ -108,7 +109,7 @@ public class SampleJob {
 
 	@Autowired
 	@Qualifier("universitydatasource")
-	private DataSource universityDataSource;
+	private DataSource universitydatasource;
 
 	@Autowired
 	@Qualifier("postgresdatasource")
@@ -121,6 +122,9 @@ public class SampleJob {
 	@Autowired
 	@Qualifier("mysqlEntityManagerFactory")
 	private EntityManagerFactory mysqlEntityManagerFactory;
+
+	@Autowired
+	private JpaTransactionManager jpaTransactionManager;
 	
 	@Bean
 	public Job firstJob() {
@@ -189,6 +193,7 @@ public class SampleJob {
 				.retry(Throwable.class)
 				//.listener(skipListener)
 				.listener(skipListenerImpl)
+				.transactionManager(jpaTransactionManager)
 				.build();
 	}
 
@@ -276,23 +281,23 @@ public class SampleJob {
 		return staxEventItemReader;
 	}
 
-	public JdbcCursorItemReader<StudentJdbc> jdbcJdbcCursorItemReader(){
-		JdbcCursorItemReader<StudentJdbc> jdbcJdbcCursorItemReader =
+	public JdbcCursorItemReader<StudentJdbc> jdbcCursorItemReader(){
+		JdbcCursorItemReader<StudentJdbc> jdbcCursorItemReader =
 				new JdbcCursorItemReader<StudentJdbc>();
 
-		jdbcJdbcCursorItemReader.setDataSource(universityDataSource);
-		jdbcJdbcCursorItemReader.setSql(
+		jdbcCursorItemReader.setDataSource(universitydatasource);
+		jdbcCursorItemReader.setSql(
 				"SELECT id, first_name as firstName,last_name as lastName," +
 						"email from student"
 		);
 
-		jdbcJdbcCursorItemReader.setRowMapper(new BeanPropertyRowMapper<StudentJdbc>(){
+		jdbcCursorItemReader.setRowMapper(new BeanPropertyRowMapper<StudentJdbc>(){
 			{
 				setMappedClass(StudentJdbc.class);
 			}
 		});
 
-		return jdbcJdbcCursorItemReader;
+		return jdbcCursorItemReader;
 
 	}
 
@@ -393,7 +398,7 @@ public class SampleJob {
 		JdbcBatchItemWriter<StudentCsv> jdbcJdbcBatchItemWriter =
 				new JdbcBatchItemWriter<StudentCsv>();
 
-		jdbcJdbcBatchItemWriter.setDataSource(universityDataSource);
+		jdbcJdbcBatchItemWriter.setDataSource(universitydatasource);
 		jdbcJdbcBatchItemWriter.setSql(
 				"insert into student(id,first_name,last_name,email) " +
 						"values(:id,:firstName,:lastName,:email)"
@@ -410,7 +415,7 @@ public class SampleJob {
 		JdbcBatchItemWriter<StudentCsv> jdbcBatchItemWriter =
 				new JdbcBatchItemWriter<StudentCsv>();
 
-		jdbcBatchItemWriter.setDataSource(universityDataSource);
+		jdbcBatchItemWriter.setDataSource(universitydatasource);
 		jdbcBatchItemWriter.setSql(
 				"insert into student(id,first_name,last_name,email) " +
 						"values(?,?,?,?)"

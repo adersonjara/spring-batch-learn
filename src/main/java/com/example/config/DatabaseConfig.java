@@ -50,6 +50,7 @@ public class DatabaseConfig {
     }
 
     @Bean
+    @Primary
     public EntityManagerFactory mysqlEntityManagerFactory(){
         LocalContainerEntityManagerFactoryBean lem =
                 new LocalContainerEntityManagerFactoryBean();

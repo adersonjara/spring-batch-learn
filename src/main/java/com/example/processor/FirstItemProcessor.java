@@ -12,7 +12,7 @@ public class FirstItemProcessor implements ItemProcessor<Student, com.example.my
     @Override
     public com.example.mysql.entity.Student process(Student item) throws Exception {
 
-        System.out.println(" * "+item.toString());
+        System.out.println(" * "+item.getId());
 
         com.example.mysql.entity.Student student =
                 new com.example.mysql.entity.Student();
