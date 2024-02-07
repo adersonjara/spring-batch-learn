@@ -181,7 +181,7 @@ public class SampleJob {
 	private Step firstChunkStep() {
 		return stepBuilderFactory.get("First Chunk Step")
 				.<Student, com.example.mysql.entity.Student>chunk(3)
-				.reader(jpaCursorItemReader())
+				.reader(jpaCursorItemReader(null,null))
 				.processor(firstItemProcessor)
 				.writer(jpaItemWriter())
 				.faultTolerant()
@@ -449,12 +449,20 @@ public class SampleJob {
 
 	 */
 
-	public JpaCursorItemReader<Student> jpaCursorItemReader(){
+	@StepScope
+	@Bean
+	public JpaCursorItemReader<Student> jpaCursorItemReader(
+			@Value("#{jobParameters['currentItemCount']}") Integer currentItemCount,
+			@Value("#{jobParameters['maxItemCount']}") Integer maxItemCount
+	){
 		JpaCursorItemReader<Student> jpaCursorItemReader =
 				new JpaCursorItemReader<Student>();
 
 		jpaCursorItemReader.setEntityManagerFactory(postgresqlEntityManagerFactory);
 		jpaCursorItemReader.setQueryString("From Student");
+
+		jpaCursorItemReader.setCurrentItemCount(currentItemCount);
+		jpaCursorItemReader.setMaxItemCount(maxItemCount);
 
 		return jpaCursorItemReader;
 	}
