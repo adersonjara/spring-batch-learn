@@ -110,6 +110,10 @@ public class SampleJob {
 	@Autowired
 	@Qualifier("universitydatasource")
 	private DataSource universityDataSource;
+
+	@Autowired
+	@Qualifier("postgresdatasource")
+	private DataSource postgresdatasource;
 	
 	@Bean
 	public Job firstJob() {
